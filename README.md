@@ -1,4 +1,4 @@
-### 一个基于maven插件：maven-enforcer-plugin的自定义规则，可以严格控制pom的引入
+### 一个基于maven插件maven-enforcer-plugin严格控制pom引入的自定义规则。
 ### 具体使用方法：
 ### 1、用maven的install到本地仓库或deploy对应的仓库
 ### 2、工程使用，定义一个父pom，让使用的工程自动使用父pom
