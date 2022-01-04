@@ -1,4 +1,4 @@
-package com.github.cyuliu.maven.enforcer.domain;
+package io.github.cyuliu.maven.enforcer.domain;
 
 import org.apache.maven.model.Dependency;
 

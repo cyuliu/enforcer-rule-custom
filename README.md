@@ -10,7 +10,7 @@
 	<version>3.0.0</version>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.cyuliu</groupId>
+			<groupId>io.github.cyuliu</groupId>
 			<artifactId>enforcer-rule-custom</artifactId>
 			<version>${version}</version>
 		</dependency>
