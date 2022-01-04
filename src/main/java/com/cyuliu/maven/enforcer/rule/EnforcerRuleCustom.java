@@ -54,8 +54,11 @@ public class EnforcerRuleCustom implements EnforcerRule {
 
             // 父子module工程，可以在配置父工程配置依赖引入规则
             // 先查父module的规则
-            CustomRule parent = findRule(project.getParent().getArtifactId(), customRules);
-
+            CustomRule parent = null;
+            // 如果是packaging是jar或者是war
+            if ("jar".equals(project.getPackaging()) || "war".equals(project.getPackaging())) {
+                parent = findRule(project.getParent().getArtifactId(), customRules);
+            }
             // 然后查找子module的规则
             CustomRule child = findRule(project.getArtifactId(), customRules);
 
@@ -74,13 +77,12 @@ public class EnforcerRuleCustom implements EnforcerRule {
             if (null != parent && null != parent.getDependencies()) {
                 ruleDependencies = parent.getDependencies();
             }
-
             // 获取子module的依赖规则配置
-            if (null == child && null != child.getDependencies()) {
+            if (null != child && null != child.getDependencies()) {
                 if (null != ruleDependencies) {
-                    // 子module的依赖规则配置覆盖父module的依赖规则配置
-                    boolean exists = false;
                     for (Dependency dependency : child.getDependencies()) {
+                        // 子module的依赖规则配置覆盖父module的依赖规则配置
+                        boolean exists = false;
                         for (Dependency d : ruleDependencies) {
                             if (dependency.getGroupId().equals(d.getGroupId()) && dependency.getArtifactId().equals(d.getArtifactId())) {
                                 exists = true;
