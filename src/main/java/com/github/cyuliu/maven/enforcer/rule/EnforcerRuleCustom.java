@@ -1,6 +1,6 @@
-package com.cyuliu.maven.enforcer.rule;
+package com.github.cyuliu.maven.enforcer.rule;
 
-import com.cyuliu.maven.enforcer.domain.CustomRule;
+import com.github.cyuliu.maven.enforcer.domain.CustomRule;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;

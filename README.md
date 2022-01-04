@@ -10,9 +10,9 @@
 	<version>3.0.0</version>
 	<dependencies>
 		<dependency>
-			<groupId>org.example</groupId>
+			<groupId>com.github.cyuliu</groupId>
 			<artifactId>enforcer-rule-custom</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${version}</version>
 		</dependency>
 	</dependencies>
 	<executions>
@@ -23,7 +23,7 @@
 			</goals>
 			<configuration>
 				<rules>
-					<enforcerRuleCustom implementation="com.cyuliu.maven.enforcer.rule.EnforcerRuleCustom">
+					<enforcerRuleCustom implementation="EnforcerRuleCustom">
 						<!--true打印错误信息，编译报错，false打印错误，可以编译通过，默认false-->
 						<shouldIfail>true</shouldIfail>
 						<customRules>
