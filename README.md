@@ -50,4 +50,6 @@
 		</execution>
 	</executions>
 </plugin>
+
+注：父子工程，可以在父module里面统一配置依赖，子module可以覆盖父module的version和classifier
 ```
