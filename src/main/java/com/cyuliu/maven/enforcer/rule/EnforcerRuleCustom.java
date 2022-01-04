@@ -49,18 +49,56 @@ public class EnforcerRuleCustom implements EnforcerRule {
                 if (shouldIfail) {
                     throw new EnforcerRuleException("The module has no configuration rules");
                 }
+                return;
             }
 
-            // 查找规则
-            CustomRule rule = findRule(project, customRules);
+            // 父子module工程，可以在配置父工程配置依赖引入规则
+            // 先查父module的规则
+            CustomRule parent = findRule(project.getParent().getArtifactId(), customRules);
+
+            // 然后查找子module的规则
+            CustomRule child = findRule(project.getArtifactId(), customRules);
+
             // 找不到规则
-            if (null == rule) {
+            if (null == parent && null == child) {
                 log.error("The module has no configuration rules, module:" + project.getArtifactId());
-                throw new EnforcerRuleException("The module has no configuration rules");
+                if (shouldIfail) {
+                    throw new EnforcerRuleException("The module has no configuration rules");
+                }
+                return;
             }
 
+            Set<Dependency> ruleDependencies = null;
+
+            // 获取父module的依赖规则配置
+            if (null != parent && null != parent.getDependencies()) {
+                ruleDependencies = parent.getDependencies();
+            }
+
+            // 获取子module的依赖规则配置
+            if (null == child && null != child.getDependencies()) {
+                if (null != ruleDependencies) {
+                    // 子module的依赖规则配置覆盖父module的依赖规则配置
+                    boolean exists = false;
+                    for (Dependency dependency : child.getDependencies()) {
+                        for (Dependency d : ruleDependencies) {
+                            if (dependency.getGroupId().equals(d.getGroupId()) && dependency.getArtifactId().equals(d.getArtifactId())) {
+                                exists = true;
+                                d.setVersion(dependency.getVersion());
+                                d.setClassifier(dependency.getClassifier());
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            ruleDependencies.add(dependency);
+                        }
+                    }
+                } else {
+                    ruleDependencies = child.getDependencies();
+                }
+            }
             // 规则没有依赖配置
-            if (null == rule.getDependencies() || rule.getDependencies().size() <= 0) {
+            if (null == ruleDependencies || ruleDependencies.size() <= 0) {
                 log.error("The module has no dependency on configuration rules, module:" + project.getArtifactId());
                 if (shouldIfail) {
                     throw new EnforcerRuleException("The module has no dependency on configuration rules");
@@ -70,7 +108,7 @@ public class EnforcerRuleCustom implements EnforcerRule {
             Set<Dependency> notDependencies = new HashSet<Dependency>();
             for (Dependency dependency : dependencies) {
                 boolean valid = false;
-                for (Dependency ruleDependency : rule.getDependencies()) {
+                for (Dependency ruleDependency : ruleDependencies) {
                     // 校验groupId，artifactId，version，classifier
                     if (StringUtils.equals(dependency.getGroupId(), ruleDependency.getGroupId())
                             && StringUtils.equals(dependency.getArtifactId(), ruleDependency.getArtifactId())
@@ -98,17 +136,17 @@ public class EnforcerRuleCustom implements EnforcerRule {
     /**
      * 查找规则
      *
-     * @param project
+     * @param module
      * @return
      */
-    private CustomRule findRule(MavenProject project, Set<CustomRule> customRules) {
+    private CustomRule findRule(String module, Set<CustomRule> customRules) {
         // 查找规则
         for (CustomRule rule : customRules) {
-            if (rule.getModule().equals(project.getArtifactId())) {
+            if (rule.getModule().equals(module)) {
                 return rule;
             }
             if (null != rule.getCustomRules() && rule.getCustomRules().size() > 0) {
-                return findRule(project, rule.getCustomRules());
+                return findRule(module, rule.getCustomRules());
             }
         }
         return null;
